@@ -1,12 +1,14 @@
-import Dashboard from './components/Dashboard'
-
+import Dashboard from "./components/Dashboard";
+import { CartProvider } from "./contexts/CartContext";
 
 const App = () => {
   return (
     <div>
-      <Dashboard/>
+      <CartProvider>
+        <Dashboard />
+      </CartProvider>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

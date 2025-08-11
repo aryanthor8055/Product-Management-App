@@ -1,55 +1,70 @@
 import { Eye, Edit, Trash2, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useDragAndDrop } from '../hooks/customHook';
 
-const products = [
-  {
-    id: 1,
-    image: "https://m.media-amazon.com/images/I/71v9XWzqQ6L._AC_UF1000,1000_QL80_.jpg",
-    name: "Wireless Bluetooth Headphones",
-    category: "Electronics",
-    price: 89.99,
-    stock: 45,
-    status: "In Stock"
-  },
-  {
-    id: 2,
-    image: "https://m.media-amazon.com/images/I/61L5QgPvgxL._AC_UF1000,1000_QL80_.jpg",
-    name: "Smartphone Pro Max",
-    category: "Electronics",
-    price: 999.00,
-    stock: 8,
-    status: "Low Stock"
-  },
-  {
-    id: 3,
-    image: "https://m.media-amazon.com/images/I/71X8N9n2UIL._AC_UF1000,1000_QL80_.jpg",
-    name: "Organic Cotton T-Shirt",
-    category: "Clothing",
-    price: 24.99,
-    stock: 0,
-    status: "Out of Stock"
-  },
-  {
-    id: 4,
-    image: "https://m.media-amazon.com/images/I/71g2ednj0JL._AC_UF1000,1000_QL80_.jpg",
-    name: "Stainless Steel Water Bottle",
-    category: "Home",
-    price: 19.95,
-    stock: 32,
-    status: "In Stock"
-  }
-];
+const ProductTable = ({ products, addToCart }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [filters, setFilters] = useState({ category: '', status: '' });
+  
+  const itemsPerPage = 10;
 
-const ProductTable = () => {
-  const columns = [
-    { key: 'id', label: 'ID' },
-    { key: 'image', label: 'Image' },
-    { key: 'name', label: 'Name' },
-    { key: 'category', label: 'Category' },
-    { key: 'price', label: 'Price' },
-    { key: 'stock', label: 'Stock' },
-    { key: 'status', label: 'Status' },
-    { key: 'actions', label: 'Actions' }
+  const initialColumns = [
+    { key: 'id', label: 'ID', sortable: true },
+    { key: 'image', label: 'Image', sortable: false },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'category', label: 'Category', sortable: true },
+    { key: 'price', label: 'Price', sortable: true },
+    { key: 'stock', label: 'Stock', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
+    { key: 'actions', label: 'Actions', sortable: false }
   ];
+
+  const {
+    columns,
+    draggedItem,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragEnd
+  } = useDragAndDrop(initialColumns);
+
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = products.filter(product => {
+      return (
+        (filters.category === '' || product.category === filters.category) &&
+        (filters.status === '' || product.status === filters.status)
+      );
+    });
+
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [products, filters, sortConfig]);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedProducts, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   const categories = [...new Set(products.map(p => p.category))];
   const statuses = [...new Set(products.map(p => p.status))];
@@ -89,7 +104,10 @@ const ProductTable = () => {
             <button className="p-1 text-red-600 hover:bg-red-50 rounded">
               <Trash2 className="w-4 h-4" />
             </button>
-            <button className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+            <button
+              onClick={() => addToCart(product)}
+              className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+            >
               Add to Cart
             </button>
           </div>
@@ -106,6 +124,8 @@ const ProductTable = () => {
           <h2 className="text-lg font-semibold text-gray-900">Products</h2>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
             <select
+              value={filters.category}
+              onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
@@ -114,6 +134,8 @@ const ProductTable = () => {
               ))}
             </select>
             <select
+              value={filters.status}
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">All Statuses</option>
@@ -129,13 +151,26 @@ const ProductTable = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-move transition-all duration-200 ${
+                    draggedItem === index ? 'opacity-50 scale-95' : ''
+                  } ${column.sortable ? 'hover:bg-gray-100' : ''}`}
+                  onClick={() => column.sortable && handleSort(column.key)}
                 >
                   <div className="flex items-center space-x-1">
                     <span>{column.label}</span>
+                    {column.sortable && sortConfig.key === column.key && (
+                      <span className="text-blue-500">
+                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
                     <Menu className="w-3 h-3 text-gray-400" />
                   </div>
                 </th>
@@ -143,7 +178,7 @@ const ProductTable = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
+            {paginatedProducts.map((product) => (
               <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                 {columns.map((column) => (
                   <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -158,21 +193,23 @@ const ProductTable = () => {
 
       <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing 1 to 4 of 4 results
+          Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedProducts.length)} of {filteredAndSortedProducts.length} results
         </div>
         <div className="flex items-center space-x-2">
           <button
-            disabled
-            className="p-2 border border-gray-300 rounded hover:bg-gray-50 opacity-50 cursor-not-allowed"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="p-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="px-4 py-2 text-sm text-gray-700">
-            Page 1 of 1
+            Page {currentPage} of {totalPages}
           </span>
           <button
-            disabled
-            className="p-2 border border-gray-300 rounded hover:bg-gray-50 opacity-50 cursor-not-allowed"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="p-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

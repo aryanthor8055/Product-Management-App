@@ -1,6 +1,7 @@
 # Product Management Dashboard
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=Dashboard+Screenshot) <!-- Add real screenshot later -->
+![Uploading image.png…]()
+
 
 ## 🚀 Features
 

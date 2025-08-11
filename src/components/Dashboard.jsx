@@ -4,7 +4,8 @@ import ProductTable from "./ProductTable";
 import StatsCards from "./StatsCard";
 import { generateMockProducts } from "../utils/mockData";
 import { useDebounce } from "../hooks/customHook";
-import { useCart } from "../contexts/CartContext"; // Import useCart
+import { useCart } from "../contexts/CartContext"; 
+import CartSidebar from "./CartSidebar";
 
 const Dashboard = () => {
   const { 
@@ -50,6 +51,15 @@ const Dashboard = () => {
           addToCart={addToCart} 
         />
       </main>
+
+        <CartSidebar
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+        cart={cart}
+        cartTotal={cartTotal}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+      />
       
     </div>
   );

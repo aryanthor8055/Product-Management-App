@@ -1,30 +1,38 @@
 import { AlertTriangle, DollarSign, Grid3X3, Package } from "lucide-react";
+import { useMemo } from "react";
 
-const StatsCards = () => {
- 
+const StatsCards = ({ products }) => {
+  const stats = useMemo(() => {
+    const totalProducts = products.length;
+    const totalRevenue = products.reduce((sum, p) => sum + (p.price * (100 - p.stock)), 0);
+    const lowStockItems = products.filter(p => p.stock <= 20 && p.stock > 0).length;
+    const categories = new Set(products.map(p => p.category)).size;
+
+    return { totalProducts, totalRevenue, lowStockItems, categories };
+  }, [products]);
 
   const cards = [
     {
       title: 'Total Products',
-      value: 400,
+      value: stats.totalProducts.toLocaleString(),
       icon: Package,
       color: 'bg-blue-500'
     },
     {
       title: 'Total Revenue',
-      value: '$12,345',
+      value: `$${stats.totalRevenue.toLocaleString()}`,
       icon: DollarSign,
       color: 'bg-green-500'
     },
     {
       title: 'Low Stock Items',
-      value: 15,
+      value: stats.lowStockItems,
       icon: AlertTriangle,
       color: 'bg-orange-500'
     },
     {
       title: 'Categories',
-      value: 8,
+      value: stats.categories,
       icon: Grid3X3,
       color: 'bg-purple-500'
     }

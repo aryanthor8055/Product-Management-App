@@ -1,12 +1,64 @@
-# React + Vite
+# Product Management Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Dashboard Preview](https://via.placeholder.com/800x400?text=Dashboard+Screenshot) <!-- Add real screenshot later -->
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### **Core Functionality**
+✔️ **Add to Cart System**  
+- Interactive cart badge in header  
+- Slide-out sidebar with:  
+  - Quantity controls (+/-)  
+  - Real-time price calculation  
+  - Item removal option  
+- Session-persisted state (in-memory)  
 
-## Expanding the ESLint configuration
+✔️ **Advanced Product Table**  
+| Column       | Features                  |
+|--------------|---------------------------|
+| ID           | Sortable                  |
+| Image        | Thumbnail preview         |
+| Name         | Searchable                |
+| Category     | Filterable                |
+| Price        | Sortable (asc/desc)       |
+| Stock        | Low-stock highlighting    |
+| Status       | Color-coded badges        |
+| Actions      | Edit/Delete/View buttons  |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+✔️ **Drag-and-Drop**  
+- Reorder table columns via drag handle  
+- Smooth CSS transitions  
+- State preserved during reordering  
+
+### **Dashboard Components**
+📊 **Stats Overview Cards**  
+- Total Products 
+- Total Revenue (auto-calculated)  
+- Low Stock Alert (<5 items)  
+- Unique Categories Count  
+
+🔍 **Search System**  
+- Debounced 300ms search  
+- Trie-based efficient searching  
+
+📱 **Responsive Design**  
+- Mobile-first approach  
+- Collapsible sidebar on small screens  
+
+## 🛠️ Tech Stack
+- **Frontend**: React 18 (Hooks Only)  
+- **Styling**: Tailwind CSS 3  
+- **Build**: Vite  
+- **Icons**: Heroicons  
+- **State Management**: Context API + useReducer  
+
+## 📦 Installation
+```bash
+# 1. Clone repository
+git clone https://github.com/your-repo/product-dashboard.git
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
+npm run dev

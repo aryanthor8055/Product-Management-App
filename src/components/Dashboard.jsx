@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Header from "./Header";
 import ProductTable from "./ProductTable";
 import StatsCards from "./StatsCard";
@@ -19,23 +19,22 @@ const Dashboard = () => {
     updateQuantity 
   } = useCart();
 
-  const [products] = useState(() => generateMockProducts(1000));
-  const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState(() => generateMockProducts(1000));
+  const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const filteredProducts = useMemo(() => {
     if (!debouncedSearchTerm) return products;
-    return products.filter(
-      (product) =>
-        product.name
-          .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase()) ||
-        product.category
-          .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase())
+    
+    return products.filter(product =>
+      product.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      product.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
   }, [products, debouncedSearchTerm]);
 
+   const deleteProduct = useCallback((productId) => {
+    setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -49,6 +48,7 @@ const Dashboard = () => {
         <ProductTable 
           products={filteredProducts} 
           addToCart={addToCart} 
+            deleteProduct={deleteProduct}
         />
       </main>
 

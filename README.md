@@ -1,7 +1,8 @@
 # Product Management Dashboard
 
-![Uploading image.png…]()
+<img width="1896" height="894" alt="image" src="https://github.com/user-attachments/assets/48dfeadc-2c52-4b2b-bd75-9fa46230a872" />
 
+Deploy Link: https://product-management-app-epri.vercel.app/
 
 ## 🚀 Features
 
